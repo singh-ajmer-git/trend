@@ -1,0 +1,23 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: trend-eks
+  region: us-west-2
+
+vpc:
+  id: vpc-020409da3e274321b
+  subnets:
+    public:
+      us-west-2a:
+        id: subnet-05fd91c15272d41ff
+      us-west-2b:
+        id: subnet-09f942c57cb23dff3
+
+managedNodeGroups:
+  - name: trend-ng
+    instanceType: t3.medium
+    desiredCapacity: 2
+    minSize: 1
+    maxSize: 2
+
