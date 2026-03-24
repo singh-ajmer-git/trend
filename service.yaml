@@ -7,5 +7,5 @@ spec:
   selector:
     app: trend-app
   ports:
-    - port: 3001        # External port
+    - port: 80        # External port
       targetPort: 80    # Container port
