@@ -41,7 +41,7 @@ resource "aws_iam_instance_profile" "ec2_profile" {
 
 # Security Group (use your existing SG)
 data "aws_security_group" "existing_sg" {
-  id = "sg-0f17f39f935d2e732" # Existing SG of your bastion/public EC2
+  id = "sg-0f17f39f935d2e732"
 }
 
 # EC2 Instance
@@ -54,7 +54,47 @@ resource "aws_instance" "web" {
   associate_public_ip_address = true
   vpc_security_group_ids      = [data.aws_security_group.existing_sg.id]
 
+  
+  user_data = <<-EOF
+            #!/bin/bash
+            set -eux
+
+            apt-get update -y
+
+            # Install required packages
+            apt-get install -y openjdk-17-jdk curl gnupg ca-certificates
+
+            # Create keyrings directory
+            mkdir -p /usr/share/keyrings
+
+            # Add Jenkins GPG key properly
+            curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key \
+              | gpg --dearmor -o /usr/share/keyrings/jenkins-keyring.gpg
+
+            # Add Jenkins repo with signed-by
+            echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.gpg] https://pkg.jenkins.io/debian-stable binary/" \
+              > /etc/apt/sources.list.d/jenkins.list
+
+            # Update and install Jenkins
+            apt-get update -y
+            apt-get install -y jenkins
+
+            # Start Jenkins
+            systemctl enable jenkins
+            systemctl start jenkins
+            EOF
+
   tags = {
     Name = "trend-ec2-jenkins"
   }
 }
+
+
+
+
+
+
+
+
+
+
